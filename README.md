@@ -1,64 +1,67 @@
-# Workers AI Playground
+# pico-world-clock
 
-Welcome to the Workers AI Playground! This project is designed to provide a user-friendly interface for interacting with AI models and exploring their capabilities. The playground allows you to connect to Model Context Protocol (MCP) servers, manage AI tools, and run AI models with ease.
+A MicroPython world clock for the Raspberry Pi Pico 2 W and Waveshare Pico-ePaper-2.9-B display. Shows three configurable cities simultaneously in a portrait layout, synced to NTP on boot and updated every minute.
 
-[![Deploy to Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/ai/tree/main/playground/ai)
+## Hardware
 
-## Features
+| Component | Notes |
+|-----------|-------|
+| Raspberry Pi Pico 2 W | Built-in WiFi required |
+| Waveshare Pico-ePaper-2.9-B | 128×296 px, Red/Black/White, UC8151D controller |
 
-- **Connect to MCP Servers**: Easily connect to MCP servers to access additional AI capabilities.
-- **Dynamic UI**: The interface is built using React and Tailwind CSS, providing a responsive and modern user experience.
-- **Tool Management**: View and manage available AI tools when connected to an MCP server.
-- **Authentication**: Supports authentication for secure access to MCP servers.
-- **Interactive Messaging**: Send messages and receive AI-generated responses in real-time.
+The display module plugs directly onto the Pico's 40-pin header — no extra wiring needed.
 
-## Getting Started
+### GPIO mapping
 
-### Prerequisites
+| Signal | GPIO |
+|--------|------|
+| SCK | GP10 |
+| MOSI | GP11 |
+| CS | GP9 |
+| DC | GP8 |
+| RST | GP12 |
+| BUSY | GP13 |
 
-- Node.js and npm installed on your machine.
+## Setup
 
-### Installation
-
-1. Clone the repository and install dependencies:
-
-   ```bash
-   git clone https://github.com/cloudflare/ai.git
-   pnpm i
-   ```
-
-2. Start the development server:
-
-   ```bash
-   cd playground/ai && npm start
-   ```
-
-3. Open your browser and navigate to `http://localhost:5173` to access the playground.
+1. Flash [MicroPython for Pico 2 W](https://micropython.org/download/RPI_PICO2_W/) onto the board.
+2. Copy all three files to the root of the Pico:
+   - `main.py`
+   - `config.py`
+   - `epd2in9b.py`
+3. Edit `config.py` with your WiFi credentials and desired time zones.
+4. Power cycle the Pico — it connects to WiFi, syncs NTP, and starts displaying.
 
 ## Configuration
 
-The project uses Tailwind CSS for styling. You can customize the theme and other configurations in the `tailwind.config.ts` file.
+```python
+# config.py
+WIFI_SSID     = "YourNetworkName"
+WIFI_PASSWORD = "YourPassword"
 
-## Usage
+NTP_HOST = "pool.ntp.org"
 
-- **Connect to a Server**: Enter the MCP server URL and click "Connect" to establish a connection.
-- **Manage Tools**: Once connected, view and interact with available AI tools.
-- **Send Messages**: Use the input field to send messages and receive AI responses.
+CLOCKS = [
+    ("SEATTLE",   -8, 0),   # (city label, UTC offset hours, UTC offset minutes)
+    ("AMSTERDAM",  1, 0),
+    ("SINGAPORE",  8, 0),
+]
+```
 
-## Generate list of models
+City labels are displayed in the red header bar. Maximum 16 characters.
 
-Running `./scripts/fetch-models.ts` will generate the `src/models.json` file. Populate `scripts/.env` with your Cloudflare API token and account ID before doing so.
+**DST note:** UTC offsets are static — adjust the hour value manually when daylight saving time changes in your target city.
 
-## Contributing
+| City | Standard | Daylight |
+|------|----------|----------|
+| Seattle | −8 (PST) | −7 (PDT) — 2nd Sunday March → 1st Sunday November |
+| Amsterdam | +1 (CET) | +2 (CEST) — last Sunday March → last Sunday October |
+| Singapore | +8 (year-round, no DST) | — |
 
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
+## Display
 
-## License
-
-This project is licensed under the MIT License.
-
-## Acknowledgments
-
-- Thanks to the contributors and the open-source community for their support and collaboration.
-
-Enjoy exploring the capabilities of AI with the Workers AI Playground!
+- 128×296 px portrait layout
+- Three clocks stacked vertically, each with a red city-name header
+- Time in large 24-hour digits, UTC offset and date below
+- Refreshes every 60 seconds; re-syncs NTP every hour
+- Shows `* NO NTP SYNC *` if time was never synced

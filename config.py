@@ -5,14 +5,14 @@ WIFI_PASSWORD = "YourPassword"
 
 NTP_HOST = "pool.ntp.org"
 
-# Three clocks: (display label, UTC offset hours, UTC offset minutes)
-# Labels: max 16 characters (each char is 8 px wide on a 128 px display)
+# Clocks: (display label, UTC offset hours, UTC offset minutes)
 # DST is not handled automatically — adjust the hour offset seasonally if needed.
 #   Seattle:    -8 standard (PST) / -7 daylight (PDT)
 #   Amsterdam:  +1 standard (CET) / +2 daylight (CEST)
 #   Singapore:  +8 year-round (no DST)
 CLOCKS = [
-    ("SEATTLE",   -8, 0),
-    ("AMSTERDAM",  1, 0),
-    ("SINGAPORE",  8, 0),
+    ("SEA", -8, 0),
+    ("GMT",  0, 0),
+    ("AMS",  1, 0),
+    ("SIN",  8, 0),
 ]

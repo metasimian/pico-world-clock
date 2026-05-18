@@ -70,5 +70,5 @@ City labels are displayed in the red header bar. Maximum 16 characters.
 (18 May 2026) There are 2 versions (switched in main.py):
    - handcoded - this was my original hack several months ago
    - claude - vibe coded off the app on my phone in a bus... (still tested off the laptop w/Thonny & the pico setup)
-Overall the approach wasn't hugely different between the two and the result is pretty much the same. 
+Overall the approach wasn't hugely different between the two and the resulting layout and behavior on the device is pretty much the same. 
 

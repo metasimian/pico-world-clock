@@ -1,13 +1,13 @@
 # pico-world-clock
 
-A MicroPython world clock for the Raspberry Pi Pico 2 W and Waveshare Pico-ePaper-2.9-B display. Shows three configurable cities simultaneously in a portrait layout, synced to NTP on boot and updated every minute.
+A MicroPython world clock for the Raspberry Pi Pico 2 W and Waveshare Pico-ePaper-2.9-B display. Shows four configurable cities simultaneously in a landscape layout, synced to NTP on boot and updated every minute.
 
 ## Hardware
 
 | Component | Notes |
 |-----------|-------|
 | Raspberry Pi Pico 2 W | Built-in WiFi required |
-| Waveshare Pico-ePaper-2.9-B | 128×296 px, Red/Black/White, UC8151D controller |
+| Waveshare Pico-ePaper-2.9-B | 296×128 px, Red/Black/White, UC8151D controller |
 
 The display module plugs directly onto the Pico's 40-pin header — no extra wiring needed.
 
@@ -22,15 +22,33 @@ The display module plugs directly onto the Pico's 40-pin header — no extra wir
 | RST | GP12 |
 | BUSY | GP13 |
 
+## Files
+
+| File | Description |
+|------|-------------|
+| `main.py` | Entry point — imports and calls `worldclock()` |
+| `worldclockclaude.py` | Main implementation |
+| `worldclockhandcoded.py` | Original hand-coded reference implementation |
+| `config.py` | WiFi credentials and clock configuration |
+
+## Dependencies
+
+The following libraries must be present on the Pico (not included in this repo):
+
+- `picoepaper29b` — display driver for Waveshare Pico-ePaper-2.9-B
+- `writer` — font rendering helper
+- `ezFBfont_courB14_ascii_17` — Courier Bold 14pt font
+
 ## Setup
 
 1. Flash [MicroPython for Pico 2 W](https://micropython.org/download/RPI_PICO2_W/) onto the board.
-2. Copy all three files to the root of the Pico:
+2. Install the dependencies above onto the Pico.
+3. Copy these files to the root of the Pico:
    - `main.py`
+   - `worldclockclaude.py`
    - `config.py`
-   - `epd2in9b.py`
-3. Edit `config.py` with your WiFi credentials and desired time zones.
-4. Power cycle the Pico — it connects to WiFi, syncs NTP, and starts displaying.
+4. Edit `config.py` with your WiFi credentials and desired time zones.
+5. Power cycle the Pico — it connects to WiFi, syncs NTP, and starts displaying.
 
 ## Configuration
 
@@ -42,13 +60,12 @@ WIFI_PASSWORD = "YourPassword"
 NTP_HOST = "pool.ntp.org"
 
 CLOCKS = [
-    ("SEATTLE",   -8, 0),   # (city label, UTC offset hours, UTC offset minutes)
-    ("AMSTERDAM",  1, 0),
-    ("SINGAPORE",  8, 0),
+    ("SEA", -8, 0),   # (city label, UTC offset hours, UTC offset minutes)
+    ("GMT",  0, 0),
+    ("AMS",  1, 0),
+    ("SIN",  8, 0),
 ]
 ```
-
-City labels are displayed in the red header bar. Maximum 16 characters.
 
 **DST note:** UTC offsets are static — adjust the hour value manually when daylight saving time changes in your target city.
 
@@ -60,15 +77,16 @@ City labels are displayed in the red header bar. Maximum 16 characters.
 
 ## Display
 
-- 128×296 px portrait layout
-- Three clocks stacked vertically, each with a red city-name header
-- Time in large 24-hour digits, UTC offset and date below
+- 296×128 px landscape layout
+- Four clocks stacked vertically with inverted city-name header per row
+- Time in 24-hour format, date to the right
 - Refreshes every 60 seconds; re-syncs NTP every hour
 - Shows `* NO NTP SYNC *` if time was never synced
+- Status messages shown on screen during WiFi connect and NTP sync
 
+## Implementations
 
-(18 May 2026) There are 2 versions (switched in main.py):
-   - handcoded - this was my original hack several months ago
-   - claude - vibe coded off the app on my phone in a bus... (still tested off the laptop w/Thonny & the pico setup)
-Overall the approach wasn't hugely different between the two and the resulting layout and behavior on the device is pretty much the same. 
+Two implementations are included, selectable in `main.py`:
 
+- **`worldclockclaude.py`** — structured implementation with robust error handling: 20-second WiFi timeout, 3 NTP retries, boot status screens, hourly re-sync, and sleep aligned to the minute boundary
+- **`worldclockhandcoded.py`** — original hand-coded version; simpler but raises on WiFi failure and drifts slightly over time

@@ -90,3 +90,5 @@ Two implementations are included, selectable in `main.py`:
 
 - **`worldclockclaude.py`** — structured implementation with robust error handling: 20-second WiFi timeout, 3 NTP retries, boot status screens, hourly re-sync, and sleep aligned to the minute boundary
 - **`worldclockhandcoded.py`** — original hand-coded version; simpler but raises on WiFi failure and drifts slightly over time
+
+(lol!  Looks like Claude was not impressed with my descriptions or code quality!)
